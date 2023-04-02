@@ -8,6 +8,7 @@ import { addVueCompatDeps } from './helpers/addVueCompatDeps'
 import { addViteConfig } from './helpers/addViteConfig'
 import { removeFile } from './helpers/fileHelpers'
 import { type Answers, type Language, type MigrationMode, type PackageManager } from './types'
+import { handleIndexFile } from './helpers/handleIndexFile'
 
 const answers: Answers = {
   mode: 'vue2Vite',
@@ -126,6 +127,7 @@ await p.group({
       // remove vue.config.js
       await removeFile(`/vue.config.${answers.language}`)
       // TODO move index.html file and replace webpack references, and add script tag
+      await handleIndexFile(answers.language)
       // TODO update the scripts in package.json
       // TODO update environment variables
       // TODO cleanup magic comments from router

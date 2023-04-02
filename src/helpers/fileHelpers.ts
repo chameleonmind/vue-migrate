@@ -36,12 +36,11 @@ export async function removeFile (fileName: string): Promise<any> {
   })
 }
 
-export async function sleep (ms: number): Promise<any> {
+export async function copyFile (source: string, destination: string): Promise<any> {
   return await new Promise((resolve, reject) => {
     try {
-      setTimeout(() => {
-        resolve('OK')
-      }, ms)
+      fs.copyFileSync(process.cwd() + source, process.cwd() + destination)
+      resolve('OK')
     } catch (e) {
       reject(e)
     }

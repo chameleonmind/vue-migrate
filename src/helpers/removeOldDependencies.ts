@@ -18,7 +18,6 @@ export async function removeOldDependencies (): Promise<any> {
   newPackage.dependencies = cleanupDependencies(parsedPackage.dependencies)
   newPackage.devDependencies = cleanupDependencies(parsedPackage.devDependencies)
 
-  console.log(parsedPackage?.eslintConfig?.parserOptions?.parser)
   if (parsedPackage?.eslintConfig?.parserOptions?.parser === 'babel-eslint') {
     delete newPackage.eslintConfig.parserOptions.parser
     newPackage.eslintConfig.env.es2022 = true

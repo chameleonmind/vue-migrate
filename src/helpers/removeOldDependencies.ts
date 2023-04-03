@@ -24,4 +24,7 @@ export async function removeOldDependencies (): Promise<any> {
   }
 
   await saveFile('/package.json', JSON.stringify(newPackage, null, 2))
+  return {
+    ok: true
+  }
 }

@@ -5,4 +5,5 @@ export interface Answers {
   mode: MigrationMode
   language: Language
   packageManager: PackageManager
+  installChoice: boolean
 }

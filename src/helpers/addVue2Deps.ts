@@ -8,7 +8,8 @@ export async function addVue2Deps (): Promise<void> {
   newPackage.dependencies = {
     ...parsedPackage.dependencies,
     '@vitejs/plugin-vue': '^1.6.1',
-    vite: '^2.5.4'
+    vite: '^2.5.4',
+    'vite-plugin-vue2': '^2.0.3'
   }
 
   await saveFile('/package.json', JSON.stringify(newPackage, null, 2))

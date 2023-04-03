@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import { copyFile, getFile, removeFile, saveFile } from './fileHelpers'
 import { type Language } from '../types'
+import { sleep } from './utils'
 
 export async function handleIndexFile (language: Language = 'js'): Promise<void> {
   // check if index.html exists
@@ -19,5 +20,7 @@ export async function handleIndexFile (language: Language = 'js'): Promise<void>
       .replace(/<\/body>/g, `<script type="module" src="/src/main.${language}"></script>\n</body>`)
 
     await saveFile('/index.html', newFileContent)
+  } else {
+    await sleep(1000)
   }
 }

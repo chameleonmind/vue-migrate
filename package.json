@@ -15,7 +15,7 @@
     }
   },
   "bin": {
-    "migrate": "./lib/index.js"
+    "vue-migrate": "./lib/index.js"
   },
   "scripts": {
     "dev": "tsup --watch",

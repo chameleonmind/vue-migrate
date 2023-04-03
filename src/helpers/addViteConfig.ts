@@ -1,9 +1,10 @@
 import * as fs from 'fs'
 import { viteConfigJsVue2, viteConfigVueCompat, viteConfigVue3 } from './fileContents'
-import { saveFile } from './fileHelpers'
+import { removeFile, saveFile } from './fileHelpers'
 import { type Language, type MigrationMode } from '../types'
+import { sleep } from './utils'
 
-export async function addViteConfig (mode: MigrationMode = 'vue2Vite', language: Language = 'js'): Promise<void> {
+export async function addViteConfig (mode: MigrationMode = 'vue2Vite', language: Language = 'js'): Promise<any> {
   const existingViteConfig = fs.existsSync(`${process.cwd()}/vite.config.${language}`)
   if (!existingViteConfig) {
     if (mode === 'vue2Vite') {
@@ -13,9 +14,10 @@ export async function addViteConfig (mode: MigrationMode = 'vue2Vite', language:
     } else if (mode === 'vue3Vite') {
       await saveFile(`/vite.config.${language}`, viteConfigVue3)
     } else {
-      throw new Error('Migration mode not supported')
+      await sleep(1000)
     }
+    await removeFile(`/vue.config.${language}`)
   } else {
-    console.log('Vite config already exists, skipping...')
+    await sleep(1000)
   }
 }

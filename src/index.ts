@@ -6,14 +6,26 @@ import { runCommand } from './helpers/runCommand'
 import pc from 'picocolors'
 import { addVueCompatDeps } from './helpers/addVueCompatDeps'
 import { addViteConfig } from './helpers/addViteConfig'
-import { removeFile } from './helpers/fileHelpers'
 import { type Answers, type Language, type MigrationMode, type PackageManager } from './types'
 import { handleIndexFile } from './helpers/handleIndexFile'
+import { handleRunScripts } from './helpers/handleRunScripts'
+import { handleEnvFiles } from './helpers/handleEnvFiles'
 
 const answers: Answers = {
   mode: 'vue2Vite',
   language: 'js',
-  packageManager: 'npm'
+  packageManager: 'npm',
+  installChoice: false
+}
+
+const jobsDone = {
+  removeOldDependencies: false,
+  addVue2Deps: false,
+  addVueCompatDeps: false,
+  addViteConfig: false,
+  handleIndexFile: false,
+  handleRunScripts: false,
+  handleEnvFiles: false
 }
 
 const packageManagerCommands: Record<string, any> = {
@@ -48,17 +60,17 @@ await p.group({
         {
           value: 'vue2Vite',
           label: 'Vue 2 with Vue CLI -> Vue 2 + Vite',
-          hint: 'Stay on Vue 2, replace Webpack with Vite'
+          hint: 'Play safe! Stay on Vue 2, replace Webpack with Vite.'
         },
         {
           value: 'vue3CompatVite',
           label: 'Vue 2 with Vue CLI -> Vue 3 Migration build + Vite',
-          hint: 'Add @vue/compat version and Vite'
+          hint: 'Recommended. Add Vue 3 migration build and slowly migrate the project to Vue 3 later.'
         },
         {
           value: 'vue3Vite',
           label: 'Vue 2 with Vue CLI -> Vue 3 + Vite',
-          hint: 'Migrate to the newest Vue 3 version and Vite'
+          hint: 'Feeling adventurous? Migrate to Vue 3 right away!'
         }
       ]
     })
@@ -112,31 +124,61 @@ await p.group({
       abortMigration()
     }
   },
+  installChoice: async () => {
+    const response = await p.select({
+      message: 'Do you want vue-migrate to automatically install new dependencies after?',
+      options: [
+        {
+          value: true,
+          label: 'Yes',
+          hint: `vue-migrate will run '${answers.packageManager} install' for you.`
+        },
+        {
+          value: false,
+          label: 'No',
+          hint: 'You can install the dependencies yourself later.'
+        }
+      ]
+    })
+
+    answers.installChoice = response as boolean
+  },
   wait: async () => {
     if (Object.values(answers).every((a) => typeof a !== 'symbol' && a !== '')) {
       const s = p.spinner()
       s.start('Updating files and dependencies...')
-      await removeOldDependencies()
+
+      const { ok: depsStatus } = await removeOldDependencies()
+      jobsDone.removeOldDependencies = depsStatus
+
       if (answers.mode === 'vue2Vite') {
         await addVue2Deps()
       } else if (answers.mode === 'vue3CompatVite') {
         await addVueCompatDeps()
       }
       // add vite.config.js or .ts, depending on selected language
+      console.log('add vite config next')
       await addViteConfig(answers.mode, answers.language)
-      // remove vue.config.js
-      await removeFile(`/vue.config.${answers.language}`)
-      // TODO move index.html file and replace webpack references, and add script tag
+      // move index.html file and replace webpack references, and add script tag
+      console.log('handle index file next')
       await handleIndexFile(answers.language)
-      // TODO update the scripts in package.json
-      // TODO update environment variables
+      // update the scripts in package.json
+      console.log('handle run scripts next')
+      await handleRunScripts()
+      // update environment variables
+      console.log('handle env files next')
+      await handleEnvFiles()
       // TODO cleanup magic comments from router
-      await runCommand(packageManagerCommands[answers.packageManager].install)
-      if (answers.mode === 'vue2Vite') {
-        await runCommand(packageManagerCommands[answers.packageManager].eslint)
+      if (answers.installChoice) {
+        await runCommand(packageManagerCommands[answers.packageManager].install)
+        if (answers.mode === 'vue2Vite') {
+          await runCommand(packageManagerCommands[answers.packageManager].eslint)
+        }
       }
       s.stop('Updated files and installed new dependencies.')
-      p.outro('Migration complete. Please check the migration guide for further steps.')
+      p.outro(`The boring part of migration complete. Please check the migration guide for further steps: https://v3-migration.vuejs.org/
+      You may need to update some dependencies manually.
+     Also, check your scripts in package.json and make sure they work as expected.`)
     }
   }
 },

@@ -157,16 +157,12 @@ await p.group({
         await addVueCompatDeps()
       }
       // add vite.config.js or .ts, depending on selected language
-      console.log('add vite config next')
       await addViteConfig(answers.mode, answers.language)
       // move index.html file and replace webpack references, and add script tag
-      console.log('handle index file next')
       await handleIndexFile(answers.language)
       // update the scripts in package.json
-      console.log('handle run scripts next')
       await handleRunScripts()
       // update environment variables
-      console.log('handle env files next')
       await handleEnvFiles()
       // TODO cleanup magic comments from router
       if (answers.installChoice) {
@@ -185,7 +181,7 @@ await p.group({
 {
   // On Cancel callback that wraps the group
   // So if the user cancels one of the prompts in the group this function will be called
-  onCancel: ({ results }) => {
+  onCancel: () => {
     abortMigration()
   }
 })

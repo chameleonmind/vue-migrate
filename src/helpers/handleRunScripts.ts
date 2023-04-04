@@ -1,6 +1,6 @@
 import { getFile, saveFile } from './fileHelpers'
 
-export async function handleRunScripts (): Promise<void> {
+export async function handleRunScripts (): Promise<{ ok: boolean }> {
   const packageJson = await getFile('/package.json')
   const parsedPackage = JSON.parse(packageJson)
 
@@ -24,4 +24,8 @@ export async function handleRunScripts (): Promise<void> {
   newPackage.scripts = newScripts
 
   await saveFile('/package.json', JSON.stringify(newPackage, null, 2))
+
+  return {
+    ok: true
+  }
 }

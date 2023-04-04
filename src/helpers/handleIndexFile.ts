@@ -3,7 +3,7 @@ import { copyFile, getFile, removeFile, saveFile } from './fileHelpers'
 import { type Language } from '../types'
 import { sleep } from './utils'
 
-export async function handleIndexFile (language: Language = 'js'): Promise<void> {
+export async function handleIndexFile (language: Language = 'js'): Promise<{ ok: boolean }> {
   // check if index.html exists
   if (fs.existsSync(process.cwd() + '/public/index.html')) {
     // make a backup of index.html
@@ -20,7 +20,15 @@ export async function handleIndexFile (language: Language = 'js'): Promise<void>
       .replace(/<\/body>/g, `<script type="module" src="/src/main.${language}"></script>\n</body>`)
 
     await saveFile('/index.html', newFileContent)
+
+    return {
+      ok: true
+    }
   } else {
     await sleep(1000)
+
+    return {
+      ok: false
+    }
   }
 }

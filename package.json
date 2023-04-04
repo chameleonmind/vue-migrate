@@ -2,6 +2,7 @@
   "name": "@chameleonmind/vue-migrate",
   "version": "0.0.1",
   "description": "A CLI tool to help with migrating projects from Vue2 with Vue CLI to Vue2/Vue3 with Vite",
+  "private": false,
   "main": "./lib/index.cjs",
   "module": "./lib/index.js",
   "type": "module",
@@ -21,7 +22,8 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "test": "test",
-    "format": "eslint --fix"
+    "format": "eslint --fix",
+    "publish-lib": "eslint --fix && changeset version && changeset publish"
   },
   "repository": {
     "type": "git",
@@ -42,6 +44,7 @@
   },
   "homepage": "https://github.com/chameleonmind/vue-migrate#readme",
   "devDependencies": {
+    "@changesets/cli": "^2.26.1",
     "@types/node": "^18.15.9",
     "@types/yargs": "^17.0.23",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
@@ -57,5 +60,10 @@
     "@clack/core": "^0.3.2",
     "@clack/prompts": "^0.6.3",
     "picocolors": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "tag": "latest"
   }
 }
